@@ -1,0 +1,25 @@
+{
+  "dataset": "MNIST IDX",
+  "note": "Loaded standard IDX files from data\\mnist.",
+  "train_size": 60000,
+  "test_size": 10000,
+  "hidden_dim": 128,
+  "epochs": 30,
+  "batch_size": 128,
+  "optimizers": {
+    "SGD": {
+      "final_train_acc": 0.9901833333333333,
+      "final_test_acc": 0.9771,
+      "final_test_loss": 0.0966293763481833,
+      "best_test_acc": 0.9774,
+      "best_epoch": 29
+    },
+    "NG": {
+      "final_train_acc": 0.98635,
+      "final_test_acc": 0.976,
+      "final_test_loss": 0.10279202782208385,
+      "best_test_acc": 0.976,
+      "best_epoch": 30
+    }
+  }
+}

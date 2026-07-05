@@ -1,0 +1,379 @@
+\documentclass[UTF8]{ctexart}
+\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\title{第一题：LIF 模型的更新过程推导与数值模拟}
+\author{}
+\date{\today}
+
+\begin{document}
+\emergencystretch=2em
+\maketitle
+
+\section{模型与记号}
+
+题目给出的 LIF 模型为
+\begin{align}
+  \frac{dV}{dt} &= -g_L V + g_{\mathrm{syn}} I_{\mathrm{syn}}, \label{eq:lif_v}\\
+  \tau \frac{d I_{\mathrm{syn}}}{dt}
+  &= - I_{\mathrm{syn}}+\mu+\sigma \frac{dW}{dt}, \label{eq:lif_i}
+\end{align}
+其中 $W$ 为标准 Wiener 过程。膜电位达到阈值 $V_{\mathrm{th}}$ 时产生一次动作电位，
+随后经历绝对不应期 $\tau_{\mathrm{ref}}$。题目未给出重置电位，本文取
+$V_{\mathrm{r}}=0$。连续两次发放之间的间隔记为
+\[
+T=\tau_{\mathrm{ref}}+\tau_h,
+\]
+其中 $\tau_h$ 是从重置电位 $V_{\mathrm r}$ 首次到达阈值 $V_{\mathrm{th}}$ 的首达时间。
+若每次发放后系统按同一规则重置，则 $T_1,T_2,\ldots$ 可看作独立同分布的更新间隔，
+从而放电计数过程
+\[
+N(t)=\max\{n:S_n\le t\},\qquad S_n=T_1+\cdots+T_n
+\]
+构成普通更新过程。
+
+\section{第（1）问：ISI 矩与更新函数的推导}
+
+\subsection{将突触电流近似为有效扩散输入}
+
+由式 \eqref{eq:lif_i} 可写成
+\[
+dI_{\mathrm{syn}}
+=\frac{\mu-I_{\mathrm{syn}}}{\tau}\,dt+\frac{\sigma}{\tau}\,dW_t.
+\]
+这是均值为 $\mu$ 的 Ornstein--Uhlenbeck 过程，其稳态协方差为
+\[
+\operatorname{Cov}\bigl(I_{\mathrm{syn}}(t),I_{\mathrm{syn}}(t+s)\bigr)
+=\frac{\sigma^2}{2\tau}e^{-|s|/\tau}.
+\]
+当突触相关时间 $\tau$ 相对放电时间尺度较小时，有
+\[
+\operatorname{Var}\left(\int_0^t (I_{\mathrm{syn}}(s)-\mu)\,ds\right)
+\approx t\cdot 2\int_0^\infty \frac{\sigma^2}{2\tau}e^{-s/\tau}\,ds
+=\sigma^2 t.
+\]
+因此可用有效一维扩散近似
+\begin{equation}
+  dV_t=(-g_LV_t+A)\,dt+B\,dB_t,\qquad
+  A=g_{\mathrm{syn}}\mu,\quad B=g_{\mathrm{syn}}\sigma,
+  \label{eq:effective_diffusion}
+\end{equation}
+来描述膜电位的首达时间。这里 $B_t$ 是另一个标准 Brownian motion。
+
+\subsection{首达时间一阶矩和二阶矩}
+
+对扩散过程 \eqref{eq:effective_diffusion}，其生成元为
+\[
+\mathcal L f(x)=(-g_Lx+A)f'(x)+\frac{B^2}{2}f''(x).
+\]
+设
+\[
+u_n(x)=\mathbb E_x[\tau_h^n],\qquad u_0(x)=1.
+\]
+由 Dynkin 公式或后向 Kolmogorov 方程，首达时间矩满足递推边值问题
+\begin{equation}
+\mathcal L u_n(x)=-n u_{n-1}(x),\qquad x<V_{\mathrm{th}},
+\label{eq:moment_ode}
+\end{equation}
+并具有边界条件
+\[
+u_n(V_{\mathrm{th}})=0,\qquad u_n(x)\text{ 在 }x\to-\infty\text{ 时有界}.
+\]
+具体地，一阶矩满足
+\begin{equation}
+(-g_Lx+A)u_1'(x)+\frac{B^2}{2}u_1''(x)=-1,
+\qquad u_1(V_{\mathrm{th}})=0,
+\label{eq:first_moment_ode}
+\end{equation}
+二阶矩满足
+\begin{equation}
+(-g_Lx+A)u_2'(x)+\frac{B^2}{2}u_2''(x)=-2u_1(x),
+\qquad u_2(V_{\mathrm{th}})=0.
+\label{eq:second_moment_ode}
+\end{equation}
+令
+\[
+\Phi(x)=\int^x \frac{2(-g_Ly+A)}{B^2}\,dy
+=\frac{2Ax-g_Lx^2}{B^2}.
+\]
+将 \eqref{eq:moment_ode} 视为关于 $u_n'(x)$ 的一阶线性方程，可得递推积分表达式
+\begin{equation}
+u_n(x)=
+n\int_x^{V_{\mathrm{th}}}
+e^{-\Phi(y)}
+\int_{-\infty}^{y}\frac{2}{B^2}e^{\Phi(z)}u_{n-1}(z)\,dz\,dy .
+\label{eq:moment_integral}
+\end{equation}
+于是 ISI 的均值和方差为
+\begin{align}
+\mathbb E[T]
+&=\tau_{\mathrm{ref}}+u_1(V_{\mathrm r}), \label{eq:isi_mean}\\
+\operatorname{Var}(T)
+&=u_2(V_{\mathrm r})-u_1(V_{\mathrm r})^2. \label{eq:isi_var}
+\end{align}
+注意不应期是确定常数，因此只改变均值，不改变方差。
+
+\subsection{更新函数的期望表达式}
+
+记 $F(t)=\mathbb P(T\le t)$，$F^{*n}$ 为 $F$ 的 $n$ 重卷积。由于
+\[
+N(t)\ge n \iff S_n=T_1+\cdots+T_n\le t,
+\]
+有
+\[
+\mathbb P(N(t)\ge n)=F^{*n}(t).
+\]
+利用非负整数随机变量恒等式
+\[
+N(t)=\sum_{n=1}^{\infty}\mathbf 1_{\{N(t)\ge n\}},
+\]
+两边取期望得到更新函数
+\begin{equation}
+M(t)=\mathbb E[N(t)]
+=\sum_{n=1}^{\infty}F^{*n}(t).
+\label{eq:renewal_mean_exact}
+\end{equation}
+若 $\widehat F(s)$ 表示 $F$ 的 Laplace--Stieltjes 变换，则
+\[
+\mathcal L\{F^{*n}\}(s)=\frac{\widehat F(s)^n}{s},
+\]
+因此
+\begin{equation}
+\widehat M(s)
+=\frac{1}{s}\sum_{n=1}^{\infty}\widehat F(s)^n
+=\frac{\widehat F(s)}{s(1-\widehat F(s))}.
+\label{eq:renewal_laplace}
+\end{equation}
+
+\subsection{更新计数方差表达式}
+
+同样利用整数变量恒等式
+\[
+N(t)^2=\sum_{n=1}^{N(t)}(2n-1)
+=\sum_{n=1}^{\infty}(2n-1)\mathbf 1_{\{N(t)\ge n\}},
+\]
+取期望得
+\begin{equation}
+\mathbb E[N(t)^2]
+=\sum_{n=1}^{\infty}(2n-1)F^{*n}(t).
+\label{eq:renewal_second_exact}
+\end{equation}
+从而
+\begin{equation}
+\operatorname{Var}(N(t))
+=\sum_{n=1}^{\infty}(2n-1)F^{*n}(t)-M(t)^2.
+\label{eq:renewal_var_exact}
+\end{equation}
+其二阶矩的 Laplace 形式为
+\begin{equation}
+\mathcal L\{\mathbb E[N(t)^2]\}(s)
+=\frac{1}{s}\sum_{n=1}^{\infty}(2n-1)\widehat F(s)^n
+=\frac{\widehat F(s)(1+\widehat F(s))}
+{s(1-\widehat F(s))^2}.
+\label{eq:renewal_second_laplace}
+\end{equation}
+若只关心长时间近似，并令
+\[
+m_T=\mathbb E[T],\qquad v_T=\operatorname{Var}(T),
+\]
+则普通更新定理和更新中心极限定理给出
+\begin{equation}
+\mathbb E[N(t)]\sim \frac{t}{m_T},
+\qquad
+\operatorname{Var}(N(t))\sim \frac{v_T}{m_T^3}\,t,
+\qquad t\to\infty.
+\label{eq:renewal_asymptotic}
+\end{equation}
+这说明平均放电率为 $1/m_T$，而计数方差的增长率由 ISI 方差 $v_T$ 决定。
+
+\section{第（2）问：给定目标矩时的参数构造}
+
+给定目标
+\[
+\mathbb E[T]\approx m,\qquad \operatorname{Var}(T)\approx s^2,
+\]
+由 \eqref{eq:isi_mean}--\eqref{eq:isi_var} 可知，只需要调节有效漂移 $A$ 和有效扩散强度
+$B$。因为
+\[
+A=g_{\mathrm{syn}}\mu,\qquad B=g_{\mathrm{syn}}\sigma,
+\]
+三元组 $(g_{\mathrm{syn}},\mu,\sigma)$ 并不唯一。本文取 $g_{\mathrm{syn}}=1$，
+然后令
+\[
+\mu=A,\qquad \sigma=B.
+\]
+若希望固定其他正值 $g_{\mathrm{syn}}=c$，则只需取
+\[
+\mu=\frac{A}{c},\qquad \sigma=\frac{B}{c}.
+\]
+
+具体构造步骤如下。
+
+\begin{enumerate}
+\item 先扣除不应期，令目标首达时间均值为
+\[
+\bar m=m-\tau_{\mathrm{ref}}.
+\]
+必须有 $\bar m>0$。
+\item 对给定 $B$，用有限差分求解 \eqref{eq:first_moment_ode}--\eqref{eq:second_moment_ode}。
+边界上取 $u_n(V_{\mathrm{th}})=0$，左端取足够远的反射边界近似自然边界。
+\item 对给定 $B$，用二分法寻找 $A$，使
+\[
+u_1(V_{\mathrm r};A,B)=\bar m.
+\]
+\item 再对 $B$ 做二分法，使
+\[
+u_2(V_{\mathrm r};A,B)-u_1(V_{\mathrm r};A,B)^2=s^2.
+\]
+\item 得到 $A,B$ 后构造
+\[
+(g_{\mathrm{syn}},\mu,\sigma)=\left(1,A,B\right).
+\]
+\end{enumerate}
+
+这里还需要说明一个数值边界处理。理论推导中，后向方程的左边界条件写为
+$x\to-\infty$ 时 $u_n(x)$ 有界，这对应扩散过程在远离阈值的左侧没有吸收边界。
+但在 Python 中不能在无穷区间上直接求解有限差分方程，因此代码把计算区间截断为
+\[
+[x_{\min},V_{\mathrm{th}}],
+\qquad
+x_{\min}
+=\min\left\{
+V_{\mathrm r}-7\frac{B}{\sqrt{2g_L}}-1,\,-2
+\right\}.
+\]
+其中 $B/\sqrt{2g_L}$ 是有效 OU 型膜电位扩散的稳态标准差尺度。这样选取
+$x_{\min}$ 可以保证左边界远低于重置电位和主要概率质量区域。数值上在
+$x_{\min}$ 处使用反射边界
+\[
+u_n(x_0)-u_n(x_1)=0,
+\]
+也就是近似令 $u_n'(x_{\min})=0$。这不是改变理论模型，而是用一个足够远的有限边界
+近似理论中的自然边界条件；当 $x_{\min}$ 继续向左移动时，该截断误差会迅速减小。
+
+数值搜索的初值可由无噪声确定性 LIF 给出。若 $B=0$，膜电位轨道为
+\[
+V(t)=\frac{A}{g_L}+\left(V_{\mathrm r}-\frac{A}{g_L}\right)e^{-g_Lt}.
+\]
+令 $V(\bar m)=V_{\mathrm{th}}$，得到
+\[
+A_0=
+\frac{g_L\left(V_{\mathrm{th}}-V_{\mathrm r}e^{-g_L\bar m}\right)}
+{1-e^{-g_L\bar m}}.
+\]
+这给出了漂移大小的合理初始范围；随后用后向方程精确匹配目标矩。
+
+\section{Python 数值模拟}
+
+程序文件为 \texttt{lif\_renewal\_sim.py}。模拟使用原始二维模型
+\begin{align*}
+dI_{\mathrm{syn}}
+&=\frac{\mu-I_{\mathrm{syn}}}{\tau}\,dt+\frac{\sigma}{\tau}\,dW_t,\\
+dV_t&=(-g_LV_t+g_{\mathrm{syn}}I_{\mathrm{syn}})\,dt,
+\end{align*}
+而不是只模拟一维扩散近似。每个 ISI 从 $V_{\mathrm r}=0$ 开始，$I_{\mathrm{syn}}(0)$
+从 OU 稳态分布
+\[
+I_{\mathrm{syn}}(0)\sim \mathcal N\left(\mu,\frac{\sigma^2}{2\tau}\right)
+\]
+抽样，用 Euler--Maruyama 格式推进；到达阈值后用线性插值估计穿越时间，并加上
+$\tau_{\mathrm{ref}}$ 得到完整 ISI。
+
+本次默认目标和常数为
+\[
+m=1.0,\qquad s^2=0.08,\qquad
+g_L=0.2,\quad \tau=0.02,\quad
+V_{\mathrm r}=0,\quad V_{\mathrm{th}}=1,\quad \tau_{\mathrm{ref}}=0.05.
+\]
+运行命令为
+\[
+\texttt{python lif\_renewal\_sim.py}.
+\]
+
+\section{代码结果与解释}
+
+程序构造出的参数为
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+参数 & 数值 \\
+\midrule
+$g_{\mathrm{syn}}$ & $1.000000$ \\
+$\mu$ & $1.146884$ \\
+$\sigma$ & $0.306647$ \\
+$A=g_{\mathrm{syn}}\mu$ & $1.146884$ \\
+$B=g_{\mathrm{syn}}\sigma$ & $0.306647$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+理论构造与原始模型仿真对比如下：
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+来源 & $\mathbb E[T]$ & $\operatorname{Var}(T)$ \\
+\midrule
+目标值 & $1.000000$ & $0.080000$ \\
+扩散近似后向方程 & $1.000000$ & $0.080000$ \\
+原始二维 SDE 仿真 & $1.032638$ & $0.079216$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+仿真使用 $8000$ 个独立 ISI，时间步长为 $5\times 10^{-4}$。相对误差为
+\[
+\frac{\widehat{\mathbb E[T]}-m}{m}=3.26\%,\qquad
+\frac{\widehat{\operatorname{Var}(T)}-s^2}{s^2}=-0.98\%.
+\]
+均值有小幅偏大，主要来自三类误差。第一，参数构造基于短相关时间极限下的一维有效扩散近似，
+而验证时使用的是带有限相关时间 $\tau=0.02$ 的原始 OU 突触电流。更具体地，
+\[
+\operatorname{Var}\left(\int_0^t(I_{\mathrm{syn}}(s)-\mu)\,ds\right)
+=\sigma^2\left[t-\tau\left(1-e^{-t/\tau}\right)\right],
+\]
+只有在 $\tau\to0$ 或 $t\gg \tau$ 的极限下才收敛到有效扩散模型使用的
+$\sigma^2t$。因此随着 $\tau\to0$，原始二维模型会更接近一维扩散近似，均值误差也应进一步收敛。
+第二，阈值穿越由 Euler--Maruyama 离散步长 $dt=5\times10^{-4}$ 和线性插值近似，
+仍会留下小的离散化误差。第三，Monte Carlo 样本量有限；本次 $8000$ 个 ISI 下，
+均值标准误约为 $\sqrt{0.079216/8000}\approx0.0031$，明显小于 $3.26\%$ 的系统偏差，
+说明有限相关时间近似是主要来源，而方差的 $-0.98\%$ 偏差已在采样波动量级内。
+总体上，构造参数能较好地达到给定 ISI 方差，并使均值保持在目标附近。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\linewidth]{results/isi_histogram.png}
+\caption{模拟得到的 ISI 分布直方图}
+\label{fig:isi_hist}
+\end{figure}
+
+图 \ref{fig:isi_hist} 给出了 $8000$ 个 ISI 样本的直方图。红色竖线是目标均值
+$m=1.0$，绿色竖线是原始二维 SDE 仿真得到的样本均值 $1.032638$。两条竖线接近，
+说明参数构造达到了题目要求的“等于或者近似”目标。直方图略向右偏，这是首达时间分布的典型形态：
+大多数轨道在平均时间附近穿越阈值，但少数受到负向噪声影响的轨道会显著延迟。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.86\linewidth]{results/renewal_counts.png}
+\caption{更新计数 $N(t)$ 的经验均值、方差与渐近公式对比}
+\label{fig:renewal_counts}
+\end{figure}
+
+图 \ref{fig:renewal_counts} 用模拟得到的 ISI 样本重抽样生成多个更新过程，计算不同时间 $t$
+下 $N(t)$ 的经验均值与经验方差。红色实线为经验 $\mathbb E[N(t)]$，红色虚线为
+$t/\widehat m_T$；蓝色实线为经验 $\operatorname{Var}(N(t))$，蓝色虚线为
+$\widehat v_Tt/\widehat m_T^3$。可以看到，随着时间增大，经验均值和方差都沿着更新理论给出的
+渐近直线增长，验证了第（1）问中的更新函数推导。
+
+\section{结论}
+
+第（1）问中，ISI 可表示为确定不应期加扩散过程首达时间，其矩由后向 Kolmogorov 方程
+\eqref{eq:moment_ode} 递推给出；更新计数的均值和方差则由 $F^{*n}$ 的卷积级数给出，
+长时间下满足 $\mathbb E[N(t)]\sim t/m_T$ 与
+$\operatorname{Var}(N(t))\sim v_Tt/m_T^3$。第（2）问中，利用
+$A=g_{\mathrm{syn}}\mu$、$B=g_{\mathrm{syn}}\sigma$ 的非唯一性，可先求有效参数
+$A,B$，再构造 $(g_{\mathrm{syn}},\mu,\sigma)$。数值模拟表明，在默认目标
+$m=1.0,s^2=0.08$ 下，构造参数使原始模型的 ISI 均值和方差与目标值较为接近。
+
+\end{document}

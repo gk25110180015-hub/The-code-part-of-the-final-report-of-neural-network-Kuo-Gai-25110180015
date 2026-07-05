@@ -1,0 +1,147 @@
+\documentclass[UTF8,a4paper]{ctexart}
+\usepackage[
+  top=2.54cm,
+  bottom=2.54cm,
+  left=3.17cm,
+  right=3.17cm,
+  footskip=1.15cm
+]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\setmainfont{Times New Roman}
+\setCJKmainfont{SimSun}
+\setCJKfamilyfont{fs}{FangSong}
+\newcommand{\fs}{\CJKfamily{fs}}
+\newcommand{\paperfont}{\fs\fontsize{14pt}{23pt}\selectfont}
+\newcommand{\checkedbox}{\ensuremath{\rlap{\raisebox{0.1ex}{\checkmark}}\square}}
+\newcommand{\emptybox}{\ensuremath{\square}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyfoot[C]{\fs\fontsize{10.5pt}{12pt}\selectfont 第 \thepage 页 共 \pageref{LastPage} 页}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\abovedisplayskip}{5pt}
+\setlength{\belowdisplayskip}{5pt}
+\setlength{\abovedisplayshortskip}{3pt}
+\setlength{\belowdisplayshortskip}{3pt}
+\setlist[enumerate,1]{
+  label=\arabic*.,
+  leftmargin=1.55em,
+  labelsep=0.35em,
+  itemsep=0pt,
+  topsep=0pt,
+  parsep=0pt,
+  partopsep=0pt
+}
+\setlist[enumerate,2]{
+  label=(\arabic*),
+  leftmargin=2.5em,
+  labelsep=0.25em,
+  itemsep=0pt,
+  topsep=0pt,
+  parsep=0pt,
+  partopsep=0pt
+}
+\setlist[itemize]{
+  label=\textbullet,
+  leftmargin=2.4em,
+  itemsep=0pt,
+  topsep=0pt,
+  parsep=0pt,
+  partopsep=0pt
+}
+
+\newcommand{\examrowheight}{\rule{0pt}{27pt}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\begin{document}
+\paperfont
+
+\begin{center}
+{\songti\bfseries\fontsize{16pt}{20pt}\selectfont 复旦大学研究生课程考试试卷}\\[13pt]
+{\fontsize{14pt}{18pt}\selectfont （2025  - 2026 学年第 2 学期）}
+\end{center}
+
+\vspace{8pt}
+
+{\fontsize{14pt}{17pt}\selectfont
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.02}
+\begin{center}
+\begin{tabular}{@{}L{2.45cm}L{5.55cm}L{2.45cm}L{4.15cm}@{}}
+\examrowheight 授课学期： & 春季 & 考试日期： & 2026-7-1 \\
+\examrowheight 课程名称： & 神经网络的模型与应用 & 课程代码： & MATH40054 \\
+\examrowheight 开课院系： & 数学科学学院 & 试卷类型： & \checkedbox A 卷\quad \emptybox B 卷 \\
+\examrowheight 考试形式： & \multicolumn{3}{L{12.15cm}}{\emptybox 开卷\quad \emptybox 闭卷\quad \emptybox 课程论文\quad \checkedbox 其他} \\
+\multicolumn{4}{@{}L{14.6cm}@{}}{\examrowheight 姓名：\quad 盖括\hspace{1.65cm} 学号：\quad 25110180015\hspace{1.30cm} 成绩：} \\
+\end{tabular}
+\end{center}
+}
+
+\vspace{24pt}
+
+\begin{center}
+（共7题，每题20分，选5道题完成即可）
+\end{center}
+
+\vspace{28pt}
+
+\begin{enumerate}
+\item 对于如下过程描述的LIF模型
+\[
+\frac{dV}{dt}=-g_LV+g_{\mathrm{syn}}I_{\mathrm{syn}}
+\]
+\[
+\tau\frac{dI_{\mathrm{syn}}}{dt}=-I_{\mathrm{syn}}+\mu+\sigma\frac{dW}{dt}
+\]
+这里W是一个标准的Wiener过程，膜电位达到阈值$V_{th}$产生动过电位放电，存在复位周期$\tau_{ref}$。$I_{syn}$描述（一个）突触电流，$\tau$是其时间常数。$\mu$、$\sigma$、$g_{syn}$、$\tau$、$g_L$皆为常数。对此动作电位发放点稳态过程的Inter-Spike-Interval的随机变量记为$T$：
+\par (1) 给出$T$的期望和方差的表达式，推导该神经元动作电位发放的更新函数(renewal function）的期望和方差表达式；
+\par (2) 给定任意的期望$m$和方差$\sigma^2$，如何构造参数$(g_{syn},\mu,\sigma)$（给定
+\newpage
+其他常数）,使得$T$的期望和方差分别等于或者近似$m$和$\sigma^2$，并通过数值模拟来验证你的结果。
+
+\item 对于一个ordinary renewal process（$X_1,X_2,\cdots,X_n,\cdots$），假设已知其更新间隔$X_n$各阶统计量，请推导该神经元动作电位发放的更新函数(renewal function）的n阶统计量的表达式。
+
+\item 考虑如下兴奋-抑制神经网络模型
+\[
+\tau_E\frac{dv_E}{dt}=-v_E+\left[M_{EE}v_E-M_{EI}v_I+h_E\right]^+
+\]
+\[
+\tau_I\frac{dv_I}{dt}=-v_I+\left[M_{IE}v_E-M_{II}v_I+h_I\right]^+
+\]
+$[z]^+=\max\{z,0\}$, $v_{E,I}$分别表示兴奋性/抑制性神经元群的发放率，$M_{ab}$分别是对应链接权重，a,b=E,I, $h_{E,I}$分别是兴奋性/抑制性神经元群接收到的外部刺激。分别给出该系统对应参数$\tau_I$和$h_E$的Hopf分叉分析，并给以实际数值模拟进行验证。
+
+\item 多神经元对刺激方向的响应模型如下。假设每个神经元的条件发放率表示如下
+\[
+f_a(s)=\exp\left(-\frac{(s-s_a)^2}{2\sigma_a^2}\right)
+\]
+其中a=1，…,N是神经元编号，s是受到外部刺激的方向角度（$[0,180^\circ]$），$s_a$是神经元a的偏好方向，$\sigma_a>0$是神经元调谐函数的参数。假设
+\newpage
+\par {\Large$\bullet$}\quad 神经元动作电位发放之间是统计独立的；
+\par {\Large$\bullet$}\quad 神经元动作电位发放是一个泊松过程。
+\par 假设贝叶斯损失为平方差：
+\[
+loss=(s-\hat{s})^2
+\]
+$\hat{s}$是估计方向角度。
+
+通过这N个神经元的动作电位发放时间点，建立对外部刺激方向s的最小方差的无偏(MVUB)估计，并计算其平方误差。可给出解析解，或者近似解，并进行数值模拟验证。
+
+\item 分离附件中音频数据中的源信号并评估质量，并且比较至少两种算法。
+
+\item 构建神经网络对MNIST数据集进行0-9手写数字的分类，并分别利用随机梯度下降（SGD）和自然梯度（NG）进行训练，并进行对比。
+
+\item 利用Reinforcement Learning算法求解迷宫最短路径搜索问题。\par 迷宫图请见附件(maze.jpg；黄色是出发位置)。
+\end{enumerate}
+
+要求：任意给出中点位置，规划出最短路径或者告知不能到达。最好给出交互式的界面。
+
+\end{document}

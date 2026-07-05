@@ -1,0 +1,18 @@
+{
+  "base_parameters": {
+    "tau_e": 1.0,
+    "tau_i": 1.0,
+    "m_ee": 2.0,
+    "m_ei": 1.5,
+    "m_ie": 2.0,
+    "m_ii": 1.0,
+    "h_e": 0.25,
+    "h_i": 0.2
+  },
+  "active_region_K": 1.0,
+  "tau_i_hopf": 2.0,
+  "omega_hopf": 0.7071067811865476,
+  "h_e_active_boundary": 0.15000000000000002,
+  "stable_example_tau_i": 1.5,
+  "oscillatory_example_tau_i": 2.8
+}

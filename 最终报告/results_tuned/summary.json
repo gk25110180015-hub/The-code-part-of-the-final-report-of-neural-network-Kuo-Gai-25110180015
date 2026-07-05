@@ -1,0 +1,25 @@
+{
+  "dataset": "MNIST-like offline digits",
+  "note": "Standard MNIST IDX files were not found, so a deterministic 28x28 digit-like fallback dataset was generated for an offline pipeline check.",
+  "train_size": 4000,
+  "test_size": 1000,
+  "hidden_dim": 64,
+  "epochs": 12,
+  "batch_size": 128,
+  "optimizers": {
+    "SGD": {
+      "final_train_acc": 1.0,
+      "final_test_acc": 0.998,
+      "final_test_loss": 0.032385104005487324,
+      "best_test_acc": 0.998,
+      "best_epoch": 5
+    },
+    "NG": {
+      "final_train_acc": 0.99475,
+      "final_test_acc": 0.992,
+      "final_test_loss": 0.16361197747484205,
+      "best_test_acc": 0.992,
+      "best_epoch": 12
+    }
+  }
+}

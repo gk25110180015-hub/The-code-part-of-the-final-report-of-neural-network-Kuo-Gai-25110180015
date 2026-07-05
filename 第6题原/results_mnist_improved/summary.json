@@ -1,0 +1,25 @@
+{
+  "dataset": "MNIST IDX",
+  "note": "Loaded standard IDX files from D:\\研究生阶段\\必修课\\神经网络\\期末报告\\第6题\\data\\mnist.",
+  "train_size": 10000,
+  "test_size": 2000,
+  "hidden_dim": 128,
+  "epochs": 30,
+  "batch_size": 128,
+  "optimizers": {
+    "SGD": {
+      "final_train_acc": 0.9858,
+      "final_test_acc": 0.9425,
+      "final_test_loss": 0.19917269038498256,
+      "best_test_acc": 0.9425,
+      "best_epoch": 30
+    },
+    "NG": {
+      "final_train_acc": 0.9693,
+      "final_test_acc": 0.9335,
+      "final_test_loss": 0.2316017742883605,
+      "best_test_acc": 0.934,
+      "best_epoch": 23
+    }
+  }
+}

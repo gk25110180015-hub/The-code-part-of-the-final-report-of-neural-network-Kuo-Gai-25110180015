@@ -1,0 +1,31 @@
+{
+  "constants": {
+    "g_l": 0.2,
+    "tau_syn": 0.02,
+    "v_reset": 0.0,
+    "v_th": 1.0,
+    "tau_ref": 0.05,
+    "g_syn": 1.0
+  },
+  "constructed_parameters": {
+    "target_mean": 1.0,
+    "target_var": 0.08,
+    "a_eff": 1.146884229497288,
+    "b_eff": 0.30664745177762665,
+    "g_syn": 1.0,
+    "mu": 1.146884229497288,
+    "sigma": 0.30664745177762665,
+    "theory_fpt_mean": 0.9499999999999721,
+    "theory_isi_mean": 0.9999999999999721,
+    "theory_isi_var": 0.08000000000030527
+  },
+  "simulation": {
+    "n_intervals": 8000,
+    "dt": 0.0005,
+    "mean": 1.0326382615617582,
+    "variance": 0.07921618178622646,
+    "cv": 0.2725578785277403,
+    "relative_mean_error": 0.0326382615617582,
+    "relative_var_error": -0.009797727672169326
+  }
+}
